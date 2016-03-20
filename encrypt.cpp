@@ -1,11 +1,16 @@
 // encrypt.c - demonstrates a vigenere cipher and a transposition cipher 
-
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <cassert>
+#include <vector>
+
+#include <sys/stat.h>
 
 using namespace std;
+
+
 
 const bool CL_ARGS = false;
 
@@ -28,6 +33,10 @@ int openFileForRead (string filename);
 int closeFile (fstream);
 
 string getKey (void);
+string sanitizeKey (string key);
+string removeDuplicateChars (string x);
+bool keyIsValid (string key);
+bool hasNoDuplicates (string key);
 int processArgs (int count, char* argv[]);
 
 
@@ -41,7 +50,6 @@ char encryptChar (char m, char k) {
     return c;
 }
 
-
 int openFileForRead (string filename) {
     return 0;
 }
@@ -51,31 +59,72 @@ int closeFile (fstream file) {
     return 0;
 }
 
-
 string getKey() {
     cout << "Enter key: " << endl;
     string keyBuffer("PLACEHOLDER STRING HERE");
     cin >> keyBuffer;
     cout << "keyBuffer now containts:" << keyBuffer << endl;
 
-    return keyBuffer;
+    return sanitizeKey(keyBuffer);
+}
+
+string sanitizeKey (string key) {
+    string sanitized(key);
+    sanitized = removeDuplicateChars(sanitized);
+    
+    return sanitized;
 }
  
+string removeDuplicateChars (string x) {
+    string newString (x);
+    return newString;
+}
+
+bool keyIsValid (string key) {
+    bool valid = false;
+    if (key.length() == KEY_LENGTH && hasNoDuplicates(key)) {
+        valid = true;
+    }
+    return valid;
+}
+
+bool hasNoDuplicates (string key) {
+    return true;
+}
+
 int processArgs(int count, char* argv[]) {
 
     return 0;
 }
 
-int printFile(FILE* file) {
-
-    return 0;
+long getFileSize(string filename)
+{
+    long size = -1;
+    struct stat stat_buffer;
+    int status = stat(filename.c_str(), &stat_buffer);
+    if (status == 0) {
+        size = stat_buffer.st_size;
+    } else {
+        size = -1;
+    }
+    return size;
 }
+
 
 int main (int argc, char* argv[]) {
     printf("Encrypt..................\n");
 
-    ifstream fileInput;
+    vector<unsigned char> plaintext(100, 0);
+    vector<unsigned char> ciphertext(100, 0);
 
+
+
+    cout << "Sizeof(char) = " << sizeof(char) << endl;
+
+    cout << "Testing string methods..." << endl;
+    //assert(sanitizeKey(string("aabbbcdefghiiiijjkkl")) == string("abcdefghij"));
+    //assert(sanitizeKey(string("abcdefghijkl")) == string("abcdefghij"));
+    assert(keyIsValid(string("abcdefghij")) == true);
 
     // get keys and filename
     if (CL_ARGS) {
@@ -95,20 +144,21 @@ int main (int argc, char* argv[]) {
     cout << "GOOD KEYS!" << endl;
     
 
-
-
     ifstream inputFile (fileToEncrypt.c_str(), ios::in | ios::binary);
 
     if (inputFile.is_open()) {
-        cout << "File opened for read..." << endl;
+        cout << endl;
+        cout << endl << "File opened for read..." << endl;
+        cout << getFileSize(fileToEncrypt) << endl;
         cout << "CONTENTS OF INPUT FILE:" << endl;
-        string line;
-        while (getline(inputFile, line)) {
-            cout << line << endl;
+        char c;
+        while (inputFile.get(c)) {
+            cout << c;
         }
+        cout << endl;
 
     } else {
-        cout << "Failed to open file!!!!!!" << endl;
+        cout << "Failed to open file!!!!!! " << fileToEncrypt << endl;
     }
 
 
@@ -117,5 +167,21 @@ int main (int argc, char* argv[]) {
 
 
 
-    return 0;
+
+    ofstream outputFile (ENCRYPTED_FILENAME.c_str(), ios::out | ios::binary);
+
+    if (outputFile.is_open()) {
+        cout << endl;
+        cout << endl << "File opened for write..." << endl;
+        cout << endl;
+    } else {
+        cout << "Failed to open file!!!!!! " << ENCRYPTED_FILENAME << endl;
+    }
+
+    inputFile.close();
+    cout << "Input file closed." << endl;
+    outputFile.close();
+    cout << "Output file closed." << endl;
+
+    exit(EXIT_SUCCESS);
 }
