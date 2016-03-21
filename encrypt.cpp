@@ -8,12 +8,15 @@
 
 #include <sys/stat.h>
 
+#include <iomanip>
+
+
 using namespace std;
 
 
 
 const bool CL_ARGS = false;
-
+const int BITS_PER_BYTE = 8;
 const int ALPHABET_LENGTH = 26;
 
 string ENCRYPTED_FILENAME("kevin-mulligan-encrypted-str");
@@ -48,6 +51,14 @@ char encryptChar (char m, char k) {
     c = (m + k) % ALPHABET_LENGTH;
 
     return c;
+}
+
+string encryptGroup (char* plain, char* key, int bits, int keyLength) {
+    string ciphertext(bits/BITS_PER_BYTE, '.');
+    //const char* c = "" ;
+    
+
+    return ciphertext;
 }
 
 int openFileForRead (string filename) {
@@ -110,7 +121,33 @@ long getFileSize(string filename)
     return size;
 }
 
+string vigenereCipher(string ptext, string key1, string key2) {
+   string ctext("");
+   cout << "Starting Vigenere cipher..." << endl;
 
+   cout << "Length key1: " << key1.length() << endl;
+   cout << "Length plaintext: " << ptext.length() << endl;
+   cout << "Bits plaintext: " << ptext.length()*BITS_PER_BYTE << endl;
+
+   for (unsigned int i = 0; i < ptext.length(); i += key1.length()) {
+       cout << ptext.substr(i, key1.length()) << endl;
+       cout << key1 << endl;
+       
+       for (unsigned int j = 0; j < key1.length(); j++) {
+           char cipherGroup = ptext[i+j]^key1[j];
+           //cout << "0x" << hex << (int)(cipherGroup) << " "; 
+           cout << (int)(cipherGroup) << " "; 
+           ctext += cipherGroup;
+       }
+       cout << endl;
+   }
+
+   
+   return ctext;
+}
+
+
+// MAIN /////////////////////////////////////////////////////////////
 int main (int argc, char* argv[]) {
     printf("Encrypt..................\n");
 
@@ -144,27 +181,33 @@ int main (int argc, char* argv[]) {
     cout << "GOOD KEYS!" << endl;
     
 
+    int fileSizeInput = getFileSize(fileToEncrypt);
+    string ptext(0, '.');
+
     ifstream inputFile (fileToEncrypt.c_str(), ios::in | ios::binary);
 
     if (inputFile.is_open()) {
         cout << endl;
         cout << endl << "File opened for read..." << endl;
-        cout << getFileSize(fileToEncrypt) << endl;
+        cout << fileSizeInput << endl;
         cout << "CONTENTS OF INPUT FILE:" << endl;
         char c;
         while (inputFile.get(c)) {
             cout << c;
+            ptext += c;
         }
         cout << endl;
+        cout << ptext << endl;
 
     } else {
         cout << "Failed to open file!!!!!! " << fileToEncrypt << endl;
     }
 
 
+    string intermediateText(vigenereCipher(ptext, key1, key2));
 
-
-
+    cout << "After Vigenere cipher: length = " << intermediateText.length() << endl;
+    cout << intermediateText << endl;
 
 
 
@@ -174,6 +217,7 @@ int main (int argc, char* argv[]) {
         cout << endl;
         cout << endl << "File opened for write..." << endl;
         cout << endl;
+        
     } else {
         cout << "Failed to open file!!!!!! " << ENCRYPTED_FILENAME << endl;
     }
