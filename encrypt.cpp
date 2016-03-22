@@ -13,19 +13,19 @@
 #include <string>
 #include <cassert>
 #include <vector>
-
 #include <sys/stat.h>
-
 #include <iomanip>
 
+//#include "crypt.h"
 
 using namespace std;
-
 
 
 const bool CL_ARGS = false;
 const int BITS_PER_BYTE = 8;
 const int ALPHABET_LENGTH = 26;
+const int MAX_KEYLENGTH = 256;
+const int MAX_FILENAME_LENGTH = 256;
 
 string ENCRYPTED_FILENAME("kevin-mulligan-encrypted-str");
 string DECRYPTED_FILENAME("kevin-mulligan-decrypted-str");
@@ -49,8 +49,11 @@ string cutKeyToLength (string key, unsigned int length);
 string removeDuplicateChars (string x);
 bool keyIsValid (string key);
 bool hasNoDuplicates (string key);
-int processArgs (int count, char* argv[]);
 
+int processArgs (int count, char* argv[]);
+string requestFilename (void);
+
+void printHex (char c);
 
 
 // HELPER FUNCTIONS /////////////////////////////
@@ -79,13 +82,29 @@ int closeFile (fstream file) {
     return 0;
 }
 
+// ask user for filename
+string requestFilename (void) {
+    string filenameBuffer(MAX_FILENAME_LENGTH, '.');
+    cout << "Enter filename of file to be encrypted: ";
+    cin >> filenameBuffer;
+
+    return filenameBuffer;
+}
+
 string getKey() {
     cout << "Enter key: " << endl;
-    string keyBuffer("PLACEHOLDER STRING HERE");
+    string keyBuffer(MAX_KEYLENGTH, '.');
     cin >> keyBuffer;
     cout << "keyBuffer now containts:" << keyBuffer << endl;
 
-    return sanitizeKey(keyBuffer);
+    string key(sanitizeKey(keyBuffer));
+
+    if (key.length() < KEY_LENGTH) {
+        cout << "Please enter longer key." << endl;
+        key = getKey();
+    }
+
+    return key;
 }
 
 string sanitizeKey (string key) {
@@ -173,9 +192,15 @@ string vigenereCipher(string ptext, string key1, string key2) {
        cout << key1 << endl;
        
        for (unsigned int j = 0; j < key1.length(); j++) {
-           char cipherGroup = ptext[i+j]^key1[j];
+           
+           // XOR key char with plaintext char and call it cipherGroup
+           char cipherGroup = ptext[i+j] ^ key1[j];
+           
            //cout << "0x" << hex << (int)(cipherGroup) << " "; 
-           cout << (int)(cipherGroup) << " "; 
+           // echo the cipher group
+           printHex(cipherGroup);
+
+           // append this to the overall ciphertext
            ctext += cipherGroup;
        }
        cout << endl;
@@ -184,6 +209,22 @@ string vigenereCipher(string ptext, string key1, string key2) {
    
    return ctext;
 }
+
+void printHex (char c) {
+
+           cout << hex;
+           cout << "0x";
+
+           // padding 0 if less than 0x10
+           if (c < 0x10) {
+               cout << "0";
+           }
+
+           cout << (int)(c) << " "; 
+           cout << dec;
+
+}
+
 
 // TESTS ////////////////////////////////////////
 int doTests (void) {
@@ -219,6 +260,7 @@ int main (int argc, char* argv[]) {
     } else {
         key1 = getKey();
         key2 = getKey();
+        fileToEncrypt = requestFilename();
     }
 
     printf("key1 length is : %d\n", (int)key1.length());
@@ -226,9 +268,12 @@ int main (int argc, char* argv[]) {
     cout << "Key1 is: " << key1 << endl;
     cout << "Key2 is: " << key2 << endl;
 
+
+
     assert(key1.length() == KEY_LENGTH);
     assert(key1.length() == KEY_LENGTH);
     cout << "GOOD KEYS!" << endl;
+    
     
 
     int fileSizeInput = getFileSize(fileToEncrypt);

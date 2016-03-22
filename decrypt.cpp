@@ -26,6 +26,7 @@ using namespace std;
 const bool CL_ARGS = false;
 const int BITS_PER_BYTE = 8;
 const int ALPHABET_LENGTH = 26;
+const int MAX_KEYLENGTH = 256;
 
 string ENCRYPTED_FILENAME("kevin-mulligan-encrypted-str");
 string DECRYPTED_FILENAME("kevin-mulligan-decrypted-str");
@@ -51,6 +52,7 @@ bool keyIsValid (string key);
 bool hasNoDuplicates (string key);
 int processArgs (int count, char* argv[]);
 
+void printHex (char c);
 
 
 // HELPER FUNCTIONS /////////////////////////////
@@ -81,11 +83,18 @@ int closeFile (fstream file) {
 
 string getKey() {
     cout << "Enter key: " << endl;
-    string keyBuffer("PLACEHOLDER STRING HERE");
+    string keyBuffer(MAX_KEYLENGTH, '.');
     cin >> keyBuffer;
     cout << "keyBuffer now containts:" << keyBuffer << endl;
 
-    return sanitizeKey(keyBuffer);
+    string key(sanitizeKey(keyBuffer));
+
+    if (key.length() < KEY_LENGTH) {
+        cout << "Please enter longer key." << endl;
+        key = getKey();
+    }
+
+    return key;
 }
 
 string sanitizeKey (string key) {
@@ -172,9 +181,15 @@ string vigenereCipher(string ptext, string key1, string key2) {
        cout << key1 << endl;
        
        for (unsigned int j = 0; j < key1.length(); j++) {
-           char cipherGroup = ptext[i+j]^key1[j];
+           
+           // XOR key char with plaintext char and call it cipherGroup
+           char cipherGroup = ptext[i+j] ^ key1[j];
+           
            //cout << "0x" << hex << (int)(cipherGroup) << " "; 
-           cout << (int)(cipherGroup) << " "; 
+           // echo the cipher group
+           printHex(cipherGroup);
+
+           // append this to the overall ciphertext
            ctext += cipherGroup;
        }
        cout << endl;
@@ -184,12 +199,29 @@ string vigenereCipher(string ptext, string key1, string key2) {
    return ctext;
 }
 
+void printHex (char c) {
+
+           cout << hex;
+           cout << "0x";
+
+           // padding 0 if less than 0x10
+           if (c < 0x10) {
+               cout << "0";
+           }
+
+           cout << (int)(c) << " "; 
+           cout << dec;
+
+}
+
 // TESTS ////////////////////////////////////////
 int doTests (void) {
+    cout << "Testing string methods..." << endl;
     assert(removeDuplicateChars(string("aabbbcdefghiiiijjkkl"))
             == string("abcdefghijkl"));
-    //assert(sanitizeKey(string("aabbbcdefghiiiijjkkl")) == string("abcdefghij"));
-    //assert(sanitizeKey(string("abcdefghijkl")) == string("abcdefghij"));
+    assert(sanitizeKey(string("aabbbcdefghiiiijjkkl"))
+            == string("abcdefghij"));
+    assert(sanitizeKey(string("abcdefghijkl")) == string("abcdefghij"));
     assert(keyIsValid(string("abcdefghij")) == true);
     
     return 0;
@@ -206,7 +238,6 @@ int main (int argc, char* argv[]) {
 
     cout << "Sizeof(char) = " << sizeof(char) << endl;
 
-    cout << "Testing string methods..." << endl;
     doTests();
 
     // get keys and filename
@@ -227,10 +258,10 @@ int main (int argc, char* argv[]) {
     cout << "GOOD KEYS!" << endl;
     
 
-    int fileSizeInput = getFileSize(fileToEncrypt);
-    string ptext(0, '.');
+    int fileSizeInput = getFileSize(ENCRYPTED_FILENAME);
+    string ctext(0, '.');
 
-    ifstream inputFile (fileToEncrypt.c_str(), ios::in | ios::binary);
+    ifstream inputFile (ENCRYPTED_FILENAME.c_str(), ios::in | ios::binary);
 
     if (inputFile.is_open()) {
         cout << endl;
@@ -240,24 +271,24 @@ int main (int argc, char* argv[]) {
         char c;
         while (inputFile.get(c)) {
             cout << c;
-            ptext += c;
+            ctext += c;
         }
         cout << endl;
-        cout << ptext << endl;
+        cout << ctext << endl;
 
     } else {
-        cout << "Failed to open file!!!!!! " << fileToEncrypt << endl;
+        cout << "Failed to open file!!!!!! " << ENCRYPTED_FILENAME << endl;
     }
 
 
-    string intermediateText(vigenereCipher(ptext, key1, key2));
+    string intermediateText(vigenereCipher(ctext, key1, key2));
 
     cout << "V-Ciphertext length = " << intermediateText.length() << endl;
     cout << intermediateText << endl;
 
 
 
-    ofstream outputFile (ENCRYPTED_FILENAME.c_str(), ios::out | ios::binary);
+    ofstream outputFile (DECRYPTED_FILENAME.c_str(), ios::out | ios::binary);
 
     if (outputFile.is_open()) {
         cout << endl;
@@ -269,7 +300,7 @@ int main (int argc, char* argv[]) {
         }
         
     } else {
-        cout << "Failed to open file!!!!!! " << ENCRYPTED_FILENAME << endl;
+        cout << "Failed to open file!!!!!! " << DECRYPTED_FILENAME << endl;
     }
 
     inputFile.close();
