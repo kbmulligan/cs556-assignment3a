@@ -1,6 +1,6 @@
-// encrypt.c - demonstrates a vigenere cipher and a transposition cipher 
-//             This file encrypts data from a given file and stores it
-//             in ENCRYPTED_FILENAME.
+// decrypt.c - demonstrates a vigenere cipher and a transposition cipher 
+//             This program decrypts the file ENCRYPTED_FILENAME and
+//             stores the decrypted binary data in DECRYPTED_FILENAME.
 // 
 // Author: kbmulligan
 // Date: March 2016
@@ -106,21 +106,20 @@ string cutKeyToLength (string key, unsigned int length) {
 string removeDuplicateChars (string x) {
     string newString (x, 0, 1);
 
-    //cout << "Removing duplicates" << endl;
-    //cout << x << endl;
+    cout << "Removing duplicates" << endl;
+    cout << x << endl;
  
     for (unsigned int i = 1; i < x.length(); i++) {
         size_t found = newString.find(x[i]);
         if (found != string::npos) {
-            //cout << x[i] << " found at: " << found << '\n';
-            ;
+            cout << x[i] << " found at: " << found << '\n';
         } else {
-            //cout << "Adding this to the newString..""" << endl;
+            cout << "Adding this to the newString..""" << endl;
             newString += x[i];    
         }
     }
     
-    //cout << newString << endl;
+    cout << newString << endl;
 
     return newString;
 }
@@ -187,16 +186,12 @@ string vigenereCipher(string ptext, string key1, string key2) {
 
 // TESTS ////////////////////////////////////////
 int doTests (void) {
-    cout << "Testing string methods..." << endl;
-
     assert(removeDuplicateChars(string("aabbbcdefghiiiijjkkl"))
             == string("abcdefghijkl"));
-    assert(sanitizeKey(string("aabbbcdefghiiiijjkkl"))
-            == string("abcdefghij"));
-    assert(sanitizeKey(string("abcdefghijkl")) == string("abcdefghij"));
+    //assert(sanitizeKey(string("aabbbcdefghiiiijjkkl")) == string("abcdefghij"));
+    //assert(sanitizeKey(string("abcdefghijkl")) == string("abcdefghij"));
     assert(keyIsValid(string("abcdefghij")) == true);
     
-    cout << "All string tests passed!" << endl;
     return 0;
 }
 
@@ -211,6 +206,7 @@ int main (int argc, char* argv[]) {
 
     cout << "Sizeof(char) = " << sizeof(char) << endl;
 
+    cout << "Testing string methods..." << endl;
     doTests();
 
     // get keys and filename
