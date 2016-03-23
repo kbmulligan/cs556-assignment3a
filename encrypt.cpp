@@ -16,55 +16,28 @@
 #include <sys/stat.h>
 #include <iomanip>
 
+#ifndef CRYPT 
 #include "crypt.h"
+#endif
 
 using namespace std;
 
 
 const bool CL_ARGS = false;
-const int BITS_PER_BYTE = 8;
-const int ALPHABET_LENGTH = 26;
-const int MAX_KEYLENGTH = 256;
-const int MAX_FILENAME_LENGTH = 256;
 
 string ENCRYPTED_FILENAME("kevin-mulligan-encrypted-str");
 string DECRYPTED_FILENAME("kevin-mulligan-decrypted-str");
 
 string fileToEncrypt("default-file");
 
-const int KEY_LENGTH = 10;
 string key1 = "KEYONEKEYO";
 string key2 = "KEYTWOKEYT";
 
 
-// FUNCTION SIGNATURES //////////////////////////
-
 
 // HELPER FUNCTIONS /////////////////////////////
-char encryptChar (char m, char k) {
-    char c = 0;
-    
-    c = (m + k) % ALPHABET_LENGTH;
 
-    return c;
-}
 
-string encryptGroup (char* plain, char* key, int bits, int keyLength) {
-    string ciphertext(bits/BITS_PER_BYTE, '.');
-    //const char* c = "" ;
-    
-
-    return ciphertext;
-}
-
-int openFileForRead (string filename) {
-    return 0;
-}
-
-int closeFile (fstream file) {
-    file.close();
-    return 0;
-}
 
 // ask user for filename
 string requestFilename (void) {
@@ -75,21 +48,6 @@ string requestFilename (void) {
     return filenameBuffer;
 }
 
-string getKey() {
-    cout << "Enter key: " << endl;
-    string keyBuffer(MAX_KEYLENGTH, '.');
-    cin >> keyBuffer;
-    cout << "keyBuffer now containts:" << keyBuffer << endl;
-
-    string key(sanitizeKey(keyBuffer));
-
-    if (key.length() < KEY_LENGTH) {
-        cout << "Please enter longer key." << endl;
-        key = getKey();
-    }
-
-    return key;
-}
 
 string sanitizeKey (string key) {
     string sanitized(key);
@@ -163,36 +121,6 @@ long getFileSize(string filename)
     return size;
 }
 
-string vigenereCipher(string ptext, string key1, string key2) {
-   string ctext("");
-   cout << "Starting Vigenere cipher..." << endl;
-
-   cout << "Length key1: " << key1.length() << endl;
-   cout << "Length plaintext: " << ptext.length() << endl;
-   cout << "Bits plaintext: " << ptext.length()*BITS_PER_BYTE << endl;
-
-   for (unsigned int i = 0; i < ptext.length(); i += key1.length()) {
-       cout << ptext.substr(i, key1.length()) << endl;
-       cout << key1 << endl;
-       
-       for (unsigned int j = 0; j < key1.length(); j++) {
-           
-           // XOR key char with plaintext char and call it cipherGroup
-           char cipherGroup = ptext[i+j] ^ key1[j];
-           
-           //cout << "0x" << hex << (int)(cipherGroup) << " "; 
-           // echo the cipher group
-           printHex(cipherGroup);
-
-           // append this to the overall ciphertext
-           ctext += cipherGroup;
-       }
-       cout << endl;
-   }
-
-   
-   return ctext;
-}
 
 void printHex (char c) {
 
@@ -210,20 +138,13 @@ void printHex (char c) {
 }
 
 
-// TESTS ////////////////////////////////////////
 
 // MAIN /////////////////////////////////////////////////////////////
 int main (int argc, char* argv[]) {
     printf("ENCRYPT..................\n");
 
-    vector<unsigned char> plaintext(100, 0);
-    vector<unsigned char> ciphertext(100, 0);
-
-
-
-    cout << "Sizeof(char) = " << sizeof(char) << endl;
-
     doTests();
+    testTransposition();
 
     // get keys and filename
     if (CL_ARGS) {
@@ -234,15 +155,13 @@ int main (int argc, char* argv[]) {
         fileToEncrypt = requestFilename();
     }
 
-    printf("key1 length is : %d\n", (int)key1.length());
-    printf("key2 length is : %d\n", (int)key2.length());
-    cout << "Key1 is: " << key1 << endl;
-    cout << "Key2 is: " << key2 << endl;
+    cout << "Key1 is: " << key1 << " -- LEN: " << (int)key1.length() << endl;
+    cout << "Key2 is: " << key2 << " -- LEN: " <<  (int)key2.length() << endl;
 
 
 
-    assert(key1.length() == KEY_LENGTH);
-    assert(key1.length() == KEY_LENGTH);
+    assert(keyIsValid(key1));
+    assert(keyIsValid(key2));
     cout << "GOOD KEYS!" << endl;
     
     
@@ -250,52 +169,16 @@ int main (int argc, char* argv[]) {
     int fileSizeInput = getFileSize(fileToEncrypt);
     string ptext(0, '.');
 
-    ifstream inputFile (fileToEncrypt.c_str(), ios::in | ios::binary);
-
-    if (inputFile.is_open()) {
-        cout << endl;
-        cout << endl << "File opened for read..." << endl;
-        cout << fileSizeInput << endl;
-        cout << "CONTENTS OF INPUT FILE:" << endl;
-        char c;
-        while (inputFile.get(c)) {
-            cout << c;
-            ptext += c;
-        }
-        cout << endl;
-        cout << ptext << endl;
-
-    } else {
-        cout << "Failed to open file!!!!!! " << fileToEncrypt << endl;
-    }
+    ptext = readStringFromFile(fileToEncrypt);
 
 
-    string intermediateText(vigenereCipher(ptext, key1, key2));
+    string c1Text(vigenereCipher(ptext, key1));
 
-    cout << "V-Ciphertext length = " << intermediateText.length() << endl;
-    cout << intermediateText << endl;
+    cout << "V-Ciphertext length = " << c1Text.length() << endl;
+    cout << c1Text << endl;
 
 
-
-    ofstream outputFile (ENCRYPTED_FILENAME.c_str(), ios::out | ios::binary);
-
-    if (outputFile.is_open()) {
-        cout << endl;
-        cout << endl << "File opened for write..." << endl;
-        cout << endl;
-
-        for (unsigned int i = 0; i < intermediateText.length(); i++ ) {
-            outputFile.put(intermediateText[i]);
-        }
-        
-    } else {
-        cout << "Failed to open file!!!!!! " << ENCRYPTED_FILENAME << endl;
-    }
-
-    inputFile.close();
-    cout << "Input file closed." << endl;
-    outputFile.close();
-    cout << "Output file closed." << endl;
+    writeStringToFile(ENCRYPTED_FILENAME, c1Text);
 
     exit(EXIT_SUCCESS);
 }

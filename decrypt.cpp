@@ -16,23 +16,21 @@
 #include <sys/stat.h>
 #include <iomanip>
 
+#ifndef CRYPT 
 #include "crypt.h"
+#endif
 
 using namespace std;
 
 
 
 const bool CL_ARGS = false;
-const int BITS_PER_BYTE = 8;
-const int ALPHABET_LENGTH = 26;
-const int MAX_KEYLENGTH = 256;
 
 string ENCRYPTED_FILENAME("kevin-mulligan-encrypted-str");
 string DECRYPTED_FILENAME("kevin-mulligan-decrypted-str");
 
 string fileToEncrypt("default-file");
 
-const int KEY_LENGTH = 10;
 string key1 = "KEYONEKEYO";
 string key2 = "KEYTWOKEYT";
 
@@ -66,21 +64,6 @@ int closeFile (fstream file) {
     return 0;
 }
 
-string getKey() {
-    cout << "Enter key: " << endl;
-    string keyBuffer(MAX_KEYLENGTH, '.');
-    cin >> keyBuffer;
-    cout << "keyBuffer now containts:" << keyBuffer << endl;
-
-    string key(sanitizeKey(keyBuffer));
-
-    if (key.length() < KEY_LENGTH) {
-        cout << "Please enter longer key." << endl;
-        key = getKey();
-    }
-
-    return key;
-}
 
 string sanitizeKey (string key) {
     string sanitized(key);
@@ -154,37 +137,6 @@ long getFileSize(string filename)
     return size;
 }
 
-string vigenereCipher(string ptext, string key1, string key2) {
-   string ctext("");
-   cout << "Starting Vigenere cipher..." << endl;
-
-   cout << "Length key1: " << key1.length() << endl;
-   cout << "Length plaintext: " << ptext.length() << endl;
-   cout << "Bits plaintext: " << ptext.length()*BITS_PER_BYTE << endl;
-
-   for (unsigned int i = 0; i < ptext.length(); i += key1.length()) {
-       cout << ptext.substr(i, key1.length()) << endl;
-       cout << key1 << endl;
-       
-       for (unsigned int j = 0; j < key1.length(); j++) {
-           
-           // XOR key char with plaintext char and call it cipherGroup
-           char cipherGroup = ptext[i+j] ^ key1[j];
-           
-           //cout << "0x" << hex << (int)(cipherGroup) << " "; 
-           // echo the cipher group
-           printHex(cipherGroup);
-
-           // append this to the overall ciphertext
-           ctext += cipherGroup;
-       }
-       cout << endl;
-   }
-
-   
-   return ctext;
-}
-
 void printHex (char c) {
 
            cout << hex;
@@ -256,32 +208,18 @@ int main (int argc, char* argv[]) {
     }
 
 
-    string intermediateText(vigenereCipher(ctext, key1, key2));
+    string pText(vigenereCipher(ctext, key1));
 
-    cout << "V-Ciphertext length = " << intermediateText.length() << endl;
-    cout << intermediateText << endl;
+    cout << "Plaintext length = " << pText.length() << endl;
+    cout << pText << endl;
 
 
+    writeStringToFile(DECRYPTED_FILENAME, pText);
 
-    ofstream outputFile (DECRYPTED_FILENAME.c_str(), ios::out | ios::binary);
 
-    if (outputFile.is_open()) {
-        cout << endl;
-        cout << endl << "File opened for write..." << endl;
-        cout << endl;
-
-        for (unsigned int i = 0; i < intermediateText.length(); i++ ) {
-            outputFile.put(intermediateText[i]);
-        }
-        
-    } else {
-        cout << "Failed to open file!!!!!! " << DECRYPTED_FILENAME << endl;
-    }
 
     inputFile.close();
     cout << "Input file closed." << endl;
-    outputFile.close();
-    cout << "Output file closed." << endl;
 
     exit(EXIT_SUCCESS);
 }
