@@ -16,7 +16,7 @@
 #include <sys/stat.h>
 #include <iomanip>
 
-//#include "crypt.h"
+#include "crypt.h"
 
 using namespace std;
 
@@ -38,22 +38,6 @@ string key2 = "KEYTWOKEYT";
 
 
 // FUNCTION SIGNATURES //////////////////////////
-char encryptChar (char m, char k);
-
-int openFileForRead (string filename);
-int closeFile (fstream);
-
-string getKey (void);
-string sanitizeKey (string key);
-string cutKeyToLength (string key, unsigned int length);
-string removeDuplicateChars (string x);
-bool keyIsValid (string key);
-bool hasNoDuplicates (string key);
-
-int processArgs (int count, char* argv[]);
-string requestFilename (void);
-
-void printHex (char c);
 
 
 // HELPER FUNCTIONS /////////////////////////////
@@ -227,23 +211,10 @@ void printHex (char c) {
 
 
 // TESTS ////////////////////////////////////////
-int doTests (void) {
-    cout << "Testing string methods..." << endl;
-
-    assert(removeDuplicateChars(string("aabbbcdefghiiiijjkkl"))
-            == string("abcdefghijkl"));
-    assert(sanitizeKey(string("aabbbcdefghiiiijjkkl"))
-            == string("abcdefghij"));
-    assert(sanitizeKey(string("abcdefghijkl")) == string("abcdefghij"));
-    assert(keyIsValid(string("abcdefghij")) == true);
-    
-    cout << "All string tests passed!" << endl;
-    return 0;
-}
 
 // MAIN /////////////////////////////////////////////////////////////
 int main (int argc, char* argv[]) {
-    printf("Encrypt..................\n");
+    printf("ENCRYPT..................\n");
 
     vector<unsigned char> plaintext(100, 0);
     vector<unsigned char> ciphertext(100, 0);

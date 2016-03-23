@@ -13,11 +13,10 @@
 #include <string>
 #include <cassert>
 #include <vector>
-
 #include <sys/stat.h>
-
 #include <iomanip>
 
+#include "crypt.h"
 
 using namespace std;
 
@@ -39,20 +38,6 @@ string key2 = "KEYTWOKEYT";
 
 
 // FUNCTION SIGNATURES //////////////////////////
-char encryptChar (char m, char k);
-
-int openFileForRead (string filename);
-int closeFile (fstream);
-
-string getKey (void);
-string sanitizeKey (string key);
-string cutKeyToLength (string key, unsigned int length);
-string removeDuplicateChars (string x);
-bool keyIsValid (string key);
-bool hasNoDuplicates (string key);
-int processArgs (int count, char* argv[]);
-
-void printHex (char c);
 
 
 // HELPER FUNCTIONS /////////////////////////////
@@ -115,20 +100,21 @@ string cutKeyToLength (string key, unsigned int length) {
 string removeDuplicateChars (string x) {
     string newString (x, 0, 1);
 
-    cout << "Removing duplicates" << endl;
-    cout << x << endl;
+    //cout << "Removing duplicates" << endl;
+    //cout << x << endl;
  
     for (unsigned int i = 1; i < x.length(); i++) {
         size_t found = newString.find(x[i]);
         if (found != string::npos) {
-            cout << x[i] << " found at: " << found << '\n';
+            //cout << x[i] << " found at: " << found << '\n';
+            ;
         } else {
-            cout << "Adding this to the newString..""" << endl;
+            //cout << "Adding this to the newString..""" << endl;
             newString += x[i];    
         }
     }
     
-    cout << newString << endl;
+    //cout << newString << endl;
 
     return newString;
 }
@@ -215,21 +201,10 @@ void printHex (char c) {
 }
 
 // TESTS ////////////////////////////////////////
-int doTests (void) {
-    cout << "Testing string methods..." << endl;
-    assert(removeDuplicateChars(string("aabbbcdefghiiiijjkkl"))
-            == string("abcdefghijkl"));
-    assert(sanitizeKey(string("aabbbcdefghiiiijjkkl"))
-            == string("abcdefghij"));
-    assert(sanitizeKey(string("abcdefghijkl")) == string("abcdefghij"));
-    assert(keyIsValid(string("abcdefghij")) == true);
-    
-    return 0;
-}
 
 // MAIN /////////////////////////////////////////////////////////////
 int main (int argc, char* argv[]) {
-    printf("Encrypt..................\n");
+    printf("DECRYPT..................\n");
 
     vector<unsigned char> plaintext(100, 0);
     vector<unsigned char> ciphertext(100, 0);
