@@ -45,4 +45,5 @@ std::string readStringFromFile (std::string filename);
 int writeStringToFile (std::string filename, std::string data);
 
 std::string vigenereCipher(std::string ptext, std::string key);
-std::string colTranspositionCipher(std::string ptext, std::string key);
+std::string columnTxCipher(std::string ptext, std::string key);
+std::string selectNthElements(std::string ptext, unsigned int nth, std::string key);

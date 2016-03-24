@@ -1,0 +1,9 @@
+Kevin Brett Mulligan
+
+execute make
+
+execute ./encrypt
+
+enter keys and filename to encrypt
+
+execute ./decrypt

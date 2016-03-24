@@ -52,6 +52,9 @@ int doTests (void) {
     assert(keyIsValid(string("abcdefghij")) == true);
     
     cout << "All string tests passed!" << endl;
+    
+    cout << string("This is a test of the selection function.") << endl;
+    cout << selectNthElements(string("This is a test of the selection function."), 1, string("LEMON")) << endl;
     return 0;
 }
 
@@ -187,7 +190,20 @@ string vigenereCipher(string ptext, string key) {
 }
 
 // TRANSPOSITION ////////////////////////////////
-string colTranspositionCipher(string ptext, string key) {
+string columnTxCipher(string ptext, string key) {
+    string newString;
 
-    return string();
+    newString += selectNthElements(ptext, 0, key);
+    
+    return newString;
+}
+
+
+string selectNthElements(string ptext, unsigned int nth, string key) {
+    string newString;
+
+    for (unsigned int i = nth; i < ptext.length(); i += key.length()) {
+        newString += ptext[i];
+    }
+    return newString;
 }
