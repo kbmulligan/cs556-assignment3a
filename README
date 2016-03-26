@@ -1,9 +1,11 @@
 Kevin Brett Mulligan
 
-execute make
+Execute make
 
-execute ./encrypt
+Execute ./encrypt
 
-enter keys and filename to encrypt
+Enter keys and filename to encrypt
 
-execute ./decrypt
+Execute ./decrypt
+
+Enter keys to decrypt
