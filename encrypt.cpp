@@ -158,13 +158,9 @@ int main (int argc, char* argv[]) {
     cout << "Key1 is: " << key1 << " -- LEN: " << (int)key1.length() << endl;
     cout << "Key2 is: " << key2 << " -- LEN: " <<  (int)key2.length() << endl;
 
-
-
     assert(keyIsValid(key1));
     assert(keyIsValid(key2));
     cout << "GOOD KEYS!" << endl;
-    
-    
 
     int fileSizeInput = getFileSize(fileToEncrypt);
     string ptext(0, '.');
