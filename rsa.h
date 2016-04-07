@@ -1,24 +1,27 @@
 // rsa.h - 
 
 #include <string>
+#include <gmp.h>
+#include <gmpxx.h>
 
 #ifndef RSAHOMEBREW
 #define RSAHOMEBREW
 #endif
 
 const int KEYLENGTH = 4096;
+const int BASE = 10;
 
-typedef long LargePrime;
-typedef long LargeInt;
+typedef mpz_t LargePrime;
+typedef mpz_t LargeInt;
 
 typedef struct _RSAPublicKey {
-    long e;
-    long n;
+    LargeInt e;
+    LargeInt n;
 } RSAPublicKey;
 
 typedef struct _RSAPrivateKey {
-    long d;
-    long n;
+    LargeInt d;
+    LargeInt n;
 } RSAPrivateKey;
 
 typedef struct _RSAKey {
@@ -28,8 +31,18 @@ typedef struct _RSAKey {
 
 typedef std::string Message;
 
-bool validE(long e, long totient_n);
+bool validE(LargeInt e, LargeInt totient_n);
 RSAKey generateRSAKey (void);
-Message runRSA (void);
+void runRSA (LargeInt result, LargeInt base, LargeInt exponent, LargeInt modulus);
 void doTests (void);
 void testGMP (void);
+void testGLP (void);
+void testRSA (void);
+
+
+void getLargePrime (LargeInt putItHere);
+void printLargeInt (LargeInt x);
+
+
+std::string readStringFromFile (std::string filename);
+int writeStringToFile (std::string filename, std::string data);
