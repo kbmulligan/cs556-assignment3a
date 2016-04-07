@@ -18,7 +18,14 @@ int main (void) {
 
     cout << "RSA: ENCRYPT............" << endl;
 
-    
+    cout << "Testing..." << endl;
+    doTests();
+
+    RSAKey key = generateRSAKey();    
+
+    cout << "Key pair generated." << endl;
+    cout << "Public: " << key.publicKey.e << endl;
+    cout << "Private: " << key.privateKey.d << endl;
 
 
     cout << "RSA: ENCRYPT complete..." << endl;

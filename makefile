@@ -8,7 +8,7 @@ decrypt: decrypt.cpp crypt.cpp
 
 
 asymmetrickey_encr: rsa.cpp asym_encr.cpp
-	g++ -o asymmetrickey_encr rsa.cpp asym_encr.cpp
+	g++ -o asymmetrickey_encr rsa.cpp asym_encr.cpp -lgmp -lgmpxx 
 
 asymmetrickey_decr: rsa.cpp asym_decr.cpp
-	g++ -o asymmetrickey_decr rsa.cpp asym_decr.cpp
+	g++ -o asymmetrickey_decr rsa.cpp asym_decr.cpp -lgmp -lgmpxx 
