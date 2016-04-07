@@ -6,7 +6,10 @@
 #define RSAHOMEBREW
 #endif
 
+const int KEYLENGTH = 4096;
+
 typedef long LargePrime;
+typedef long LargeInt;
 
 typedef struct _RSAPublicKey {
     long e;
@@ -28,3 +31,5 @@ typedef std::string Message;
 bool validE(long e, long totient_n);
 RSAKey generateRSAKey (void);
 Message runRSA (void);
+void doTests (void);
+void testGMP (void);
